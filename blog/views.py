@@ -3,14 +3,23 @@ from flask import render_template
 from . import app
 from .database import session, Entry
 
-
-PAGINATE_BY = 10
+# defaut = 10, update it with new value
 
 @app.route("/")
 @app.route("/page/<int:page>")
-def entries(page=1):
+def entries(page=1, PAGINATE_BY=10):
     # Zero-indexed page
+    # import pdb; pdb.set_trace()
+    try:
+        PAGINATE_BY= int(request.args.get('PAGINATE_BY'))
+    except (KeyError, TypeError):
+        pass
     page_index = page - 1
+
+    if PAGINATE_BY == 5 or PAGINATE_BY==10 or PAGINATE_BY==20:
+        pass
+    else:
+        PAGINATE_BY = 10
 
     count = session.query(Entry).count()
 
@@ -74,3 +83,22 @@ def edit_entry_post(id):
     session.add(entry)
     session.commit()
     return redirect(url_for('one_entry', id=id))
+
+@app.route("/entry/id/<int:id>/delete", methods=["GET"])
+def delete_entry_get(id):
+    entry = session.query(Entry).get(id)
+    return render_template(
+        "delete_entry.html",
+         entry = entry
+    )
+
+@app.route("/entry/id/<int:id>/delete", methods=["POST"])
+def delete_entry_post(id):
+    entry = session.query(Entry).get(id)
+    print(dir(session))
+    session.commit()
+    return redirect(url_for("entries", page=1))
+
+@app.route("/entry/id/<int:id>/cancel", methods=["GET"])
+def delete_entry_cancel(id):
+    return redirect(url_for("entries", page=1))

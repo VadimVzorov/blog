@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from . import app
 
-engine = create_engine(app.config["DATABASE_URL"])
+engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
