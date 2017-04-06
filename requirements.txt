@@ -16,3 +16,4 @@ python-editor==1.0.3
 SQLAlchemy==1.1.6
 Werkzeug==0.12
  
+splinter
