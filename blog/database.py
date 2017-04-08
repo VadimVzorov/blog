@@ -34,6 +34,11 @@ class User(Base, UserMixin):
     entries = relationship("Entry", backref="author")
     roles = relationship("Role", backref="roles")
 
+
+    # def __rre
+    def __str__(self):
+        return "Name: {}, Roles: {}".format(self.name, [role.role_name for role in self.roles])
+
 class Role(Base):
     __tablename__="roles"
     id = Column(Integer, primary_key=True)

@@ -34,13 +34,16 @@ def entries(page=1, PAGINATE_BY=10):
     entries = session.query(Entry)
     entries = entries.order_by(Entry.datetime.desc())
     entries = entries[start:end]
-
+    user = current_user
+    role = session.query(Role)
     return render_template("entries.html",
         entries=entries,
         has_next=has_next,
         has_prev=has_prev,
         page=page,
-        total_pages=total_pages
+        total_pages=total_pages,
+        user = user,
+        role = role
     )
 
 @app.route("/entry/add", methods=["GET"])
@@ -59,7 +62,6 @@ def add_entry_post():
         content=request.form["content"],
         author=current_user
     )
-    import pdb; pdb.set_trace()
     role = Role(
         roles = current_user,
         role_name = "Author"

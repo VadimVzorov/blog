@@ -15,5 +15,6 @@ psycopg2==2.7
 python-editor==1.0.3
 SQLAlchemy==1.1.6
 Werkzeug==0.12
+postgresql==9.6.2
  
 splinter
