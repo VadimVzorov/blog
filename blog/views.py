@@ -75,8 +75,12 @@ def one_entry(id):
     entry = session.query(Entry).get(id)
     session.add(entry)
     session.commit()
+    user = current_user
+    role = session.query(Role)
     return render_template("one_entry.html",
-        entry = entry
+        entry = entry,
+        user = user,
+        role = role
     )
 
 @app.route("/entry/id/<int:id>/edit", methods=["GET"])
@@ -90,7 +94,7 @@ def edit_entry_get(id):
             entry = entry
         )
     else:
-        abort(403)
+        return redirect(url_for("entries", page=1))
 
 @app.route("/entry/id/<int:id>/edit", methods=["POST"])
 @login_required
