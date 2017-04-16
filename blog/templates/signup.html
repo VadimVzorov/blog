@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Please enter your email and password</h1>
+<form role="form" method="POST">
+    <div class="form-group">
+        <label for="name">Email address</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Your name" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Email address" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+    </div>
+    <div class="form-group">
+        <label for="password2">Repeat Password</label>
+        <input type="password" class="form-control" id="password" name="password2" placeholder="Re-enter Password" required>
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+{% endblock %}

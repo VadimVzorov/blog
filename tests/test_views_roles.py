@@ -39,11 +39,13 @@ class TestViews(unittest.TestCase):
         Base.metadata.drop_all(engine)
 
     def login_admin(self):
+        # another pdb for when admin logs
         with self.client.session_transaction() as session:
             session["user_id"] = str(self.user_admin.id)
             session["_fresh"] = True
 
     def login_editor(self):
+        # pdb here.
         with self.client.session_transaction() as session:
             session["user_id"] = str(self.user_editor.id)
             session["_fresh"] = True
@@ -97,6 +99,7 @@ class TestViews(unittest.TestCase):
 
     def test_edit_entry_admin(self):
         self.add_entry()
+        import pdb; pdb.set_trace()
         self.login_admin()
         response = self.client.post("/entry/id/1/edit", data={
             "title": "Edited Entry Title by admin",
@@ -119,8 +122,14 @@ class TestViews(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(urlparse(response.location).path, "/page/1")
 
+    def login(self, user):
 
+        with self.client.session_transaction() as session:
+            session["user_id"] = str(user.id)
+            session["_fresh"] = True
 
+    def test_loginuser(self):
+        self.login(self.user_admin)
 
 
 

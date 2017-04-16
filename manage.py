@@ -4,6 +4,15 @@ from blog.database import session, Entry
 
 from blog import app
 
+from getpass import getpass
+
+from werkzeug.security import generate_password_hash
+
+from blog.database import User
+
+from flask_migrate import Migrate, MigrateCommand
+from blog.database import Base
+from blog.database import Role
 
 manager = Manager(app)
 
@@ -23,11 +32,7 @@ def seed():
         session.add(entry)
     session.commit()
 
-from getpass import getpass
 
-from werkzeug.security import generate_password_hash
-
-from blog.database import User
 
 @manager.command
 def adduser():
@@ -46,7 +51,6 @@ def adduser():
     session.add(user)
     session.commit()
 
-from blog.database import Role
 
 @manager.command
 def createroles():
@@ -74,8 +78,7 @@ def createroles():
 #     session.add(admin)
 #     session.commit()
 
-from flask_migrate import Migrate, MigrateCommand
-from blog.database import Base
+
 
 class DB(object):
     def __init__(self, metadata):

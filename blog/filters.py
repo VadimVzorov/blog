@@ -19,11 +19,10 @@ def dateformat(date, format):
 
 @app.template_filter()
 def author_check(user, entry):
-    if user.id == entry.author_id:
-        return True
-    elif "Admin" in [role.role_name for role in user.roles]:
-        return True
-    else:
-        return False
+    return user.id == entry.author_id or "Admin"\
+    in [role.role_name for role in user.roles]
+    #     return True
+    # else:
+    #     return False
 
         # {allowed: True}

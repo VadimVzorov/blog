@@ -1,9 +1,11 @@
-from flask import render_template
+from flask import render_template, flash, request, redirect, url_for
 
 from . import app
-from .database import session, Entry, Role
-from flask_login import login_required, current_user
+from .database import session, Entry, Role, User
+from flask_login import login_required, current_user,login_user, logout_user
 from .decorators import check_role, check_author
+from werkzeug.security import check_password_hash, generate_password_hash
+
 # defaut = 10, update it with new value
 
 @app.route("/")
@@ -51,9 +53,6 @@ def entries(page=1, PAGINATE_BY=10):
 def add_entry_get():
     return render_template("add_entry.html")
 
-from flask import request, redirect, url_for
-from flask_login import current_user
-
 @app.route("/entry/add", methods=["POST"])
 @login_required
 def add_entry_post():
@@ -62,11 +61,14 @@ def add_entry_post():
         content=request.form["content"],
         author=current_user
     )
-    role = Role(
-        roles = current_user,
-        role_name = "Author"
-    )
-    session.add(entry,role)
+    #check if current_user has author role
+    if not "Author" in [role.role_name for role in current_user.roles]:
+        role = Role(
+            roles = current_user,
+            role_name = "Author"
+        )
+        session.add(role)
+    session.add(entry)
     session.commit()
     return redirect(url_for("entries"))
 
@@ -122,7 +124,7 @@ def delete_entry_get(id):
 @check_role(current_user, ['Author','Admin'])
 def delete_entry_post(id):
     entry = session.query(Entry).get(id)
-    print(dir(session))
+    session.delete(entry)
     session.commit()
     return redirect(url_for("entries", page=1))
 
@@ -136,10 +138,7 @@ def delete_entry_cancel(id):
 def login_get():
     return render_template("login.html")
 
-from flask import flash
-from flask_login import login_user, logout_user
-from werkzeug.security import check_password_hash
-from .database import User
+
 
 @app.route("/login", methods=["POST"])
 def login_post():
@@ -158,3 +157,37 @@ def login_post():
 def logout():
     logout_user()
     return redirect(url_for("entries"))
+
+@app.route("/signup", methods=["GET"])
+def sign_up():
+    #if user is already logged in then display "you are already logged in"
+    #if user is logged out then display sign up form
+    user = current_user
+    if not user.is_anonymous:
+        flash("Please logout first")
+        return redirect(url_for("entries"))
+    else:
+        return render_template("signup.html")
+
+@app.route("/signup", methods=["POST"])
+def sign_up_post():
+    name = request.form["name"]
+    email = request.form["email"]
+    password = request.form["password"]
+    password2 = request.form["password2"]
+    #check if user exists
+    user_check = session.query(User).filter_by(email = email).first()
+    if password == password2 and len(password)>7:
+        if not user_check:
+            new_user = User(name = name, email = email, password = generate_password_hash(password))
+            session.add(new_user)
+            session.commit()
+            user = session.query(User).filter_by(email=email).first()
+            login_user(user)
+            return redirect(url_for("entries"))
+        else:
+            flash("User already exists. Try again.")
+            return redirect(url_for("sign_up"))
+    else:
+        flash("Please check your password")
+        return redirect(url_for("sign_up"))
